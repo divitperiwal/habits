@@ -1,11 +1,19 @@
+import { ApiError } from '@/utils/response/error';
 import { sendError } from '@/utils/response/response.js';
 import type { NextFunction, Request, Response } from 'express';
+import { ZodError } from 'zod';
 
 export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
-    if (error.name === 'ValidationError') return sendError(res, 400, 'Validation Error', error);
-    if (error.name === 'UnauthorizedError') return sendError(res, 401, 'Unauthorized Access', error);
+    if (error instanceof ApiError) return sendError(res, error.statusCode, error.message, error.details);
 
-    return sendError(res, 500, error.message || 'Internal Server Error', process.env.NODE_ENV === 'development' ? error.stack : undefined,);
+    if (error instanceof ZodError) {
+        return sendError(res, 400, 'Validation Error', error.issues.map(e => ({
+            field: e.path.length > 0 ? e.path.join('.') : 'body',
+            message: e.message
+        })))
+    }
+
+    return sendError(res, 500, 'Internal Server Error', process.env.NODE_ENV === 'development' ? error.stack : undefined,);
 };
 
 export const notFound = (req: Request, res: Response, next: NextFunction) => {
