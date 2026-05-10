@@ -4,6 +4,7 @@ import { sendSuccess } from './utils/response/response';
 import { errorHandler, notFound } from './middlewares/error.middleware';
 import authRoutes from '@/modules/auth/auth.route';
 import habitRoutes from '@/modules/habits/habits.route';
+import trackingRoutes from '@/modules/tracking/tracking.route';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get('/health', (_, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/habits', habitRoutes);
+app.use('/api/v1/habits/:id', trackingRoutes);
 
 app.use(errorHandler)
 app.use(notFound)
