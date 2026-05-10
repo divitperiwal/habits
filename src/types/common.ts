@@ -1,3 +1,5 @@
+import type { JWTPayload } from "jose";
+
 export interface SuccessResponse {
   success: boolean;
   statusCode: number;
@@ -19,4 +21,8 @@ export interface ApiErrorResponse {
   details?: any;
 }
 
+export interface TokenPayload extends JWTPayload {
+  id: string;
+  email: string;
+}
 
