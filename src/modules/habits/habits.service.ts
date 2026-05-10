@@ -16,7 +16,7 @@ export const HabitsService = {
                 page,
                 limit,
                 total,
-                totalPages: Math.ceil(total / limit)
+                totalPages: Math.ceil(total / limit) || 1,
             }
         }
     },
