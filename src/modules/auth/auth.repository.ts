@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 export const AuthRepository = {
     findUserByEmail: async (email: string) => {
-        const user = await db.select({ id: users.id, email: users.email }).from(users).where(eq(users.email, email)).limit(1);
+        const [user] = await db.select({ id: users.id, email: users.email }).from(users).where(eq(users.email, email)).limit(1);
         return user ?? null;
     },
 

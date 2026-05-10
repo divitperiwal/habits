@@ -14,7 +14,8 @@ export const AuthService = {
         if (!user) throw new ApiError("Failed to create user", 500);
 
         const token = await signToken(user.id, user.email);
-        return { token, user };
+        const userWithoutPassword = { id: user.id, email: user.email, createdAt: user.createdAt };
+        return { token, user: userWithoutPassword };
     },
 
     login: async (email: string, password: string) => {
@@ -26,7 +27,8 @@ export const AuthService = {
         if (!isPasswordValid) throw new ApiError("Invalid email or password", 401);
 
         const token = await signToken(user.id, user.email);
-        return { token, user };
+        const userWithoutPassword = { id: user.id, email: user.email, createdAt: user.createdAt };
+        return { token, user: userWithoutPassword };
     },
 
     logout: async () => {
