@@ -2,6 +2,8 @@ import express from 'express';
 import helmet from 'helmet';
 import { sendSuccess } from './utils/response/response';
 import { errorHandler, notFound } from './middlewares/error.middleware';
+import authRoutes from '@/modules/auth/auth.route';
+import habitRoutes from '@/modules/habits/habits.route';
 
 const app = express();
 
@@ -15,6 +17,9 @@ app.get('/', (_, res) => {
 app.get('/health', (_, res) => {
     sendSuccess(res, 200, "Server is healthy", { timestamp: new Date().toISOString() });
 });
+
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/habits', habitRoutes);
 
 app.use(errorHandler)
 app.use(notFound)
