@@ -6,12 +6,15 @@
   "scripts": {
     "dev": "bun --watch src/server.ts",
     "start": "bun src/server.ts",
-    "build": "tsc --outDir dist"
+    "build": "bun build src/server.ts --outdir dist --target bun --minify",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/express": "^5.0.6",
-    "@types/pg": "^8.20.0"
+    "@types/pg": "^8.20.0",
+    "drizzle-kit": "^0.31.10"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -23,6 +26,7 @@
     "helmet": "^8.1.0",
     "ioredis": "^5.10.1",
     "jose": "^6.2.3",
+    "pg": "^8.20.0",
     "zod": "^4.4.3"
   }
 }
