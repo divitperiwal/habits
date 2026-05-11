@@ -18,7 +18,8 @@ export const AuthController = {
     }),
 
     logout: asyncHandler(async (req: Request, res: Response) => {
-        await AuthService.logout();
+        const token = req.headers.authorization?.split(' ')[1];
+        await AuthService.logout(token!);
         sendSuccess(res, 200, "User logged out successfully");
     })
 }

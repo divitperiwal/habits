@@ -1,3 +1,4 @@
+import { AuthCache } from '@/modules/auth/auth.cache';
 import { asyncHandler } from '@/utils/response/async';
 import { ApiError } from '@/utils/response/error';
 import { verifyToken } from '@/utils/security/jwt';
@@ -14,8 +15,8 @@ export const AuthMiddleware = asyncHandler(async (req: Request, res: Response, n
     const payload = await verifyToken(token);
 
 
-    //Implement token blacklist check through redis later
-    // if (await isTokenBlacklist(token)) throw new ApiError('Unauthorized: Token is blacklisted', 401);
+    const isBlacklisted = await AuthCache.get(payload.jti);
+    if (isBlacklisted) throw new ApiError('Unauthorized: Token is blacklisted', 401);
 
     req.user = { id: payload.id, email: payload.email };
     next();

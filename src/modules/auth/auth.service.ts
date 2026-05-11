@@ -1,7 +1,8 @@
 import { ApiError } from "@/utils/response/error"
 import { AuthRepository } from "./auth.repository";
 import { hashPassword, verifyPassword } from "@/utils/security/hashing";
-import { signToken } from "@/utils/security/jwt";
+import { decodeToken, signToken } from "@/utils/security/jwt";
+import { AuthCache } from "./auth.cache";
 
 export const AuthService = {
     register: async (name: string, email: string, password: string) => {
@@ -31,7 +32,11 @@ export const AuthService = {
         return { token, user: userWithoutPassword };
     },
 
-    logout: async () => {
-        //Adding Options for token blacklisting through redis
+    logout: async (token: string) => {
+        const { jti, exp } = decodeToken(token);
+        if (!jti || !exp) throw new ApiError("Invalid token", 400);
+
+        const ttl = exp - Math.floor(Date.now() / 1000);
+        await AuthCache.set(jti, '1', ttl)
     }
 }
