@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { apiRequest, cleanDb, registerUser, uniqueEmail } from "./helpers";
+import { apiRequest, cleanDb, registerUser, uniqueEmail } from "../helpers";
 
 describe("POST /api/v1/auth/register", () => {
     beforeAll(cleanDb);

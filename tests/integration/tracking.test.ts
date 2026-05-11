@@ -3,12 +3,11 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { db } from "@/config/database.config";
 import { habits, trackingLogs } from "@/database/schema";
-import { apiRequest, cleanDb, createHabit, registerUser } from "./helpers";
+import { apiRequest, cleanDb, createHabit, daysAgo, registerUser } from "../helpers";
 import { eq } from "drizzle-orm";
 
 dayjs.extend(utc);
 
-const dateDaysAgo = (days: number) => dayjs.utc().subtract(days, "day").format("YYYY-MM-DD");
 
 describe("POST /api/v1/habits/:id/track", () => {
     let token: string;
@@ -83,13 +82,13 @@ describe("GET /api/v1/habits/:id/history", () => {
         ({ habit: { id: habitId } } = await createHabit(token, { name: "Read" }));
 
         await db.insert(trackingLogs).values([
-            { userId, habitId, date: dateDaysAgo(0), note: "Today" },
-            { userId, habitId, date: dateDaysAgo(1), note: "Yesterday" },
-            { userId, habitId, date: dateDaysAgo(2), note: "Two days ago" },
-            { userId, habitId, date: dateDaysAgo(3), note: "Three days ago" },
+            { userId, habitId, date: daysAgo(0), note: "Today" },
+            { userId, habitId, date: daysAgo(1), note: "Yesterday" },
+            { userId, habitId, date: daysAgo(2), note: "Two days ago" },
+            { userId, habitId, date: daysAgo(3), note: "Three days ago" },
         ]);
 
-        await db.update(habits).set({ createdAt: new Date(dateDaysAgo(3)) }).where(eq(habits.id, habitId));
+        await db.update(habits).set({ createdAt: new Date(daysAgo(3)) }).where(eq(habits.id, habitId));
     });
 
     test("returns habits from the day of registering the habit", async () => {
@@ -110,7 +109,7 @@ describe("GET /api/v1/habits/:id/history", () => {
 
     test("tracked dates show completed true", async () => {
         const response = await apiRequest("GET", `/api/v1/habits/${habitId}/history?days=3`, undefined, token);
-        const today = response.body.data.find((day: any) => day.date === dateDaysAgo(0));
+        const today = response.body.data.find((day: any) => day.date === daysAgo(0));
 
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);

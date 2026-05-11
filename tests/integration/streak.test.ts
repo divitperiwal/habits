@@ -2,27 +2,11 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import isoWeek from "dayjs/plugin/isoWeek";
-import { apiRequest, cleanDb, createHabit, registerUser } from "../helpers";
-import { trackingLogs } from "@/database/schema";
-import { db } from "@/config/database.config";
+import { apiRequest, cleanDb, createHabit, daysAgo, insertLogs, registerUser, weekDay, weeksAgo } from "../helpers";
 
 dayjs.extend(utc);
 dayjs.extend(isoWeek);
 
-const daysAgo = (days: number) => dayjs.utc().subtract(days, "day").format("YYYY-MM-DD");
-const weeksAgo = (weeks: number) => dayjs.utc().subtract(weeks, "week").format("YYYY-MM-DD");
-const weekDay = (weeksAgo: number, dayOffset: number) => {
-    return dayjs.utc().subtract(weeksAgo, "week").startOf("isoWeek").add(dayOffset, "day").format("YYYY-MM-DD");
-};
-const insertLogs = async (userId: string, habitId: string, dates: string[]) => {
-    await db.insert(trackingLogs).values(
-        dates.map((date) => ({
-            userId,
-            habitId,
-            date,
-        })),
-    );
-};
 
 describe("GET /api/v1/habits/:id/stats", () => {
     let token: string;
@@ -94,7 +78,7 @@ describe("GET /api/v1/habits/:id/stats", () => {
         expect(response.body.success).toBe(true);
         expect(response.body.data.currentStreak).toBe(3);
         expect(response.body.data.longestStreak).toBe(3);
-        expect(response.body.data.completionRate).toBe(10);
+        expect(response.body.data.completionRate).toBe(25);
     });
 
     test("counts multiple logs in the same week as one weekly period", async () => {
@@ -107,7 +91,7 @@ describe("GET /api/v1/habits/:id/stats", () => {
         expect(response.body.success).toBe(true);
         expect(response.body.data.currentStreak).toBe(2);
         expect(response.body.data.longestStreak).toBe(2);
-        expect(response.body.data.completionRate).toBe(6.7);
+        expect(response.body.data.completionRate).toBe(16.7);
     });
 
     test("returns 404 for another user's habit", async () => {

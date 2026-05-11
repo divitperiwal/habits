@@ -1,8 +1,8 @@
-import { afterAll } from "bun:test";
-import { db, pool } from "@/config/database.config";
+import { db } from "@/config/database.config";
 import { habits, trackingLogs, users } from "@/database/schema";
 import { ensureServer } from "./setup";
 import redis from "@/config/redis.config";
+import dayjs from "dayjs";
 
 
 export const cleanDb = async () => {
@@ -63,3 +63,20 @@ export const createHabit = async (token: string, overrides: Record<string, unkno
     };
 };
 
+export const daysAgo = (days: number) => dayjs.utc().subtract(days, "day").format("YYYY-MM-DD");
+
+export const weeksAgo = (weeks: number) => dayjs.utc().subtract(weeks, "week").format("YYYY-MM-DD");
+
+export const weekDay = (weeksAgo: number, dayOffset: number) => {
+    return dayjs.utc().subtract(weeksAgo, "week").startOf("isoWeek").add(dayOffset, "day").format("YYYY-MM-DD");
+};
+
+export const insertLogs = async (userId: string, habitId: string, dates: string[]) => {
+    await db.insert(trackingLogs).values(
+        dates.map((date) => ({
+            userId,
+            habitId,
+            date,
+        })),
+    );
+};
