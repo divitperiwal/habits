@@ -10,7 +10,7 @@ export const TrackingService = {
         if (!habit) throw new ApiError("Habit not found", 404);
 
         const isAlreadyTracked = await TrackingRepository.isTrackedToday(userId, habitId);
-        if (isAlreadyTracked) throw new ApiError("Habit already tracked for today", 400);
+        if (isAlreadyTracked) throw new ApiError("Habit already tracked for today", 409);
 
         return await TrackingRepository.trackHabit(userId, habitId, data);
     },

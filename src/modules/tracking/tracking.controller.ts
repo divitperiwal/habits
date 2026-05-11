@@ -12,7 +12,7 @@ export const TrackingController = {
 
         const log = await TrackingService.trackHabit(user!.id, habitId, data);
 
-        sendSuccess(res, 200, "Habit tracked successfully", log);
+        sendSuccess(res, 201, "Habit tracked successfully", log);
     }),
 
     getHistory: asyncHandler(async (req, res) => {

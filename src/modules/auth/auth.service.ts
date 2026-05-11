@@ -7,7 +7,7 @@ export const AuthService = {
     register: async (name: string, email: string, password: string) => {
         if (!name || !email || !password) throw new ApiError("Name, email and password are required", 400);
         const userExists = await AuthRepository.findUserByEmail(email);
-        if (userExists) throw new ApiError("User already exists", 400);
+        if (userExists) throw new ApiError("User already exists", 409);
 
         const passwordHash = await hashPassword(password);
         const user = await AuthRepository.createUser(name, email, passwordHash);
