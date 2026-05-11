@@ -5,16 +5,17 @@ import type { NextFunction, Request, Response } from "express";
 export const createRateLimiter = (windowSeconds: number, maxRequests: number) => {
 
     return async (req: Request, _: Response, next: NextFunction) => {
-            const ip = req.ip;
-            const key = `rate-limit:${ip}`;
+        if (process.env.NODE_ENV === "development") return next();
+        const ip = req.ip;
+        const key = `rate-limit:${ip}`;
 
-            const requests = await redis.incr(key);
+        const requests = await redis.incr(key);
 
-            if (requests === 1) await redis.expire(key, windowSeconds);
+        if (requests === 1) await redis.expire(key, windowSeconds);
 
-            if (requests > maxRequests) throw new ApiError(`Too many requests. Please try again later.`, 429);
+        if (requests > maxRequests) throw new ApiError(`Too many requests. Please try again later.`, 429);
 
-            next();
+        next();
 
     };
 };
