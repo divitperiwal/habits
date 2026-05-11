@@ -5,11 +5,13 @@ import { errorHandler, notFound } from './middlewares/error.middleware';
 import authRoutes from '@/modules/auth/auth.route';
 import habitRoutes from '@/modules/habits/habits.route';
 import trackingRoutes from '@/modules/tracking/tracking.route';
+import { apiRateLimiter, authRateLimiter } from './middlewares/rate-limit.middleware';
 
 const app = express();
 
 app.use(helmet())
-app.use(express.json());
+app.use(express.json({ limit: '32kb' }));
+app.use(apiRateLimiter);
 
 app.get('/', (_, res) => {
     sendSuccess(res, 200, 'Welcome to the Habit Tracker API');
@@ -19,7 +21,7 @@ app.get('/health', (_, res) => {
     sendSuccess(res, 200, "Server is healthy", { timestamp: new Date().toISOString() });
 });
 
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth', authRateLimiter, authRoutes);
 app.use('/api/v1/habits', habitRoutes);
 app.use('/api/v1/habits/:id', trackingRoutes);
 
