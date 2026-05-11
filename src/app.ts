@@ -6,12 +6,14 @@ import authRoutes from '@/modules/auth/auth.route';
 import habitRoutes from '@/modules/habits/habits.route';
 import trackingRoutes from '@/modules/tracking/tracking.route';
 import { apiRateLimiter, authRateLimiter } from './middlewares/rate-limit.middleware';
+import { setupSwagger } from '../docs/swagger';
 
 const app = express();
 
 app.use(helmet())
 app.use(express.json({ limit: '32kb' }));
 app.use(apiRateLimiter);
+setupSwagger(app);
 
 app.get('/', (_, res) => {
     sendSuccess(res, 200, 'Welcome to the Habit Tracker API');
