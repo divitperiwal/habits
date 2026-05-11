@@ -9,6 +9,7 @@ router.use(AuthMiddleware);
 router.post('/', HabitsController.createHabit);
 
 router.get('/', HabitsController.getAllHabits);
+router.get('/:id/stats', HabitsController.getStats);
 router.get('/:id', HabitsController.getHabit);
 
 router.put('/:id', HabitsController.updateHabit);

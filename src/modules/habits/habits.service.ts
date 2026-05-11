@@ -1,6 +1,7 @@
 import { ApiError } from "@/utils/response/error";
 import type { CreateHabitInput, UpdateHabitInput } from "./habits.type";
 import { HabitsRepository } from "./habits.repository";
+import { calculateCompletionRate, calculateCurrentStreak, calculateLongestStreak } from "@/utils/helper/streak";
 
 export const HabitsService = {
     createHabit: async (userId: string, data: CreateHabitInput) => {
@@ -40,6 +41,23 @@ export const HabitsService = {
         const habit = await HabitsRepository.deleteHabit(userId, habitId);
         if (!habit) throw new ApiError('Habit not found', 404);
         return;
+    },
+
+    getStats: async (userId: string, habitId: string) => {
+        const habit = await HabitsRepository.getHabitById(userId, habitId);
+        if (!habit) throw new ApiError('Habit not found', 404);
+
+        const logs = await HabitsRepository.getTrackingLogs(userId, habitId);
+
+        const dates = logs.map(log => log.date);
+        const completionRateDay = habit.frequency === 'daily' ? 30 : 12;
+        return {
+            currentStreak: calculateCurrentStreak(dates, habit.frequency),
+            longestStreak: calculateLongestStreak(dates, habit.frequency),
+            completionRate: calculateCompletionRate(dates, completionRateDay, habit.frequency)
+        }
+
     }
+
 
 }

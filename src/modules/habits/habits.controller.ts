@@ -31,6 +31,14 @@ export const HabitsController = {
         sendSuccess(res, 200, 'Habit retrieved successfully', habit);
     }),
 
+    getStats: asyncHandler(async (req: Request, res: Response) => {
+        const user = req.user;
+        const { id: habitId } = habitIdSchema.parse(req.params);
+        const stats = await HabitsService.getStats(user!.id, habitId);
+
+        sendSuccess(res, 200, 'Habit stats retrieved successfully', stats);
+    }),
+
     updateHabit: asyncHandler(async (req: Request, res: Response) => {
         const user = req.user;
         const { id: habitId } = habitIdSchema.parse(req.params);

@@ -1,7 +1,7 @@
 import { db } from "@/config/database.config";
 import type { CreateHabitInput, GetAllHabitsInput, UpdateHabitInput } from "./habits.type";
-import { habits } from "@/database/schema";
-import { and, arrayContains, eq, isNull, count as countFn } from "drizzle-orm";
+import { habits, trackingLogs } from "@/database/schema";
+import { and, arrayContains, eq, isNull, count as countFn, inArray } from "drizzle-orm";
 
 export const HabitsRepository = {
     createHabit: async (userId: string, data: CreateHabitInput) => {
@@ -92,7 +92,16 @@ export const HabitsRepository = {
         }).where(and(eq(habits.userId, userId), eq(habits.id, habitId), isNull(habits.deletedAt))).returning({
             id: habits.id,
         });
-        
+
         return habit ?? null;
+    },
+
+    getTrackingLogs: async (userId: string, habitId: string) => {
+        return await db
+            .select({
+                date: trackingLogs.date,
+            })
+            .from(trackingLogs)
+            .where(and(eq(trackingLogs.userId, userId), eq(trackingLogs.habitId, habitId)));
     }
 }
