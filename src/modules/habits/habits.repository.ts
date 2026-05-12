@@ -1,7 +1,7 @@
 import { db } from "@/config/database.config";
 import type { CreateHabitInput, GetAllHabitsInput, UpdateHabitInput } from "./habits.type";
 import { habits, trackingLogs } from "@/database/schema";
-import { and, arrayContains, eq, isNull, count as countFn, inArray } from "drizzle-orm";
+import { and, arrayContains, eq, isNull, count as countFn, isNotNull, lte } from "drizzle-orm";
 
 export const HabitsRepository = {
     createHabit: async (userId: string, data: CreateHabitInput) => {
@@ -103,5 +103,9 @@ export const HabitsRepository = {
             })
             .from(trackingLogs)
             .where(and(eq(trackingLogs.userId, userId), eq(trackingLogs.habitId, habitId)));
+    },
+
+    cleanUp: async (date: Date) => {
+        await db.delete(habits).where(and(isNotNull(habits.deletedAt), lte(habits.deletedAt, date)))
     }
 }
